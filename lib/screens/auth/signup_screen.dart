@@ -93,8 +93,8 @@ class _SignupScreenState extends State<SignupScreen> {
 
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       
-      // Use email verification signup
-      final success = await authProvider.signupWithEmailVerification(
+      // Use regular signup (without email verification)
+      final success = await authProvider.signup(
         name: _nameController.text.trim(),
         email: _emailController.text.trim(),
         password: _passwordController.text,
@@ -105,22 +105,12 @@ class _SignupScreenState extends State<SignupScreen> {
 
       if (success && mounted) {
         Fluttertoast.showToast(
-          msg: "Verification code sent to your email!",
+          msg: "Account created successfully!",
           backgroundColor: AppTheme.successColor,
         );
         
-        // Navigate to email verification screen
-        context.go(
-          '/email-verification',
-          extra: {
-            'email': _emailController.text.trim(),
-            'password': _passwordController.text,
-            'name': _nameController.text.trim(),
-            'phone': _phoneController.text.trim(),
-            'location': _selectedCity!,
-            'role': _selectedRole,
-          },
-        );
+        // Navigate directly to home screen
+        context.go('/home');
       } else if (mounted) {
         Fluttertoast.showToast(
           msg: authProvider.errorMessage ?? "Signup Failed!",
