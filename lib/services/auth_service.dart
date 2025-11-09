@@ -197,4 +197,115 @@ class AuthService {
       throw Exception('Failed to delete account: $e');
     }
   }
+
+  // ============================================
+  // EMAIL OTP VERIFICATION (2FA during signup)
+  // ============================================
+
+  // Sign up with email verification required
+  Future<Map<String, dynamic>> signupWithEmailVerification({
+    required String name,
+    required String email,
+    required String password,
+    required String phone,
+    required String location,
+    String role = 'buyer',
+  }) async {
+    try {
+      // Sign up with Supabase Auth - email confirmation will be required
+      final authResponse = await _supabase.auth.signUp(
+        email: email,
+        password: password,
+        data: {
+          'name': name,
+        },
+        emailRedirectTo: null, // This ensures OTP is sent
+      );
+
+      if (authResponse.user == null) {
+        throw Exception('Failed to create account');
+      }
+
+      // Store user data temporarily until email is verified
+      // The user profile will be created after email verification
+      return {
+        'success': true,
+        'userId': authResponse.user!.id,
+        'message': 'Verification code sent to $email',
+        'emailConfirmationSent': true,
+      };
+    } on AuthException catch (e) {
+      throw Exception(e.message);
+    } catch (e) {
+      throw Exception('Signup failed: $e');
+    }
+  }
+
+  // Verify email OTP
+  Future<bool> verifyEmailOTP({
+    required String email,
+    required String token,
+  }) async {
+    try {
+      final response = await _supabase.auth.verifyOTP(
+        type: OtpType.signup,
+        email: email,
+        token: token,
+      );
+
+      if (response.user == null) {
+        throw Exception('Invalid verification code');
+      }
+
+      return true;
+    } on AuthException catch (e) {
+      throw Exception(e.message);
+    } catch (e) {
+      throw Exception('Verification failed: $e');
+    }
+  }
+
+  // Resend email OTP
+  Future<void> resendEmailOTP({required String email}) async {
+    try {
+      await _supabase.auth.resend(
+        type: OtpType.signup,
+        email: email,
+      );
+    } on AuthException catch (e) {
+      throw Exception(e.message);
+    } catch (e) {
+      throw Exception('Failed to resend code: $e');
+    }
+  }
+
+  // Create user profile after email verification
+  Future<UserModel?> createUserProfileAfterVerification({
+    required String userId,
+    required String name,
+    required String email,
+    required String phone,
+    required String location,
+    required String role,
+  }) async {
+    try {
+      final userProfile = await _supabase
+          .from(SupabaseConfig.usersTable)
+          .upsert({
+            'id': userId,
+            'name': name,
+            'email': email,
+            'phone': phone,
+            'location': location,
+            'role': role,
+            'is_verified': true,
+          })
+          .select()
+          .single();
+
+      return UserModel.fromJson(userProfile);
+    } catch (e) {
+      throw Exception('Failed to create user profile: $e');
+    }
+  }
 }

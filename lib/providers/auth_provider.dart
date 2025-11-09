@@ -99,4 +99,38 @@ class AuthProvider with ChangeNotifier {
 
   // Check if user is admin
   bool get isAdmin => _currentUser?.role == 'admin';
+
+  // Signup with Email Verification
+  Future<bool> signupWithEmailVerification({
+    required String name,
+    required String email,
+    required String password,
+    required String phone,
+    required String location,
+    String role = 'buyer',
+  }) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final result = await _authService.signupWithEmailVerification(
+        name: name,
+        email: email,
+        password: password,
+        phone: phone,
+        location: location,
+        role: role,
+      );
+      
+      _isLoading = false;
+      notifyListeners();
+      return result['success'] ?? false;
+    } catch (e) {
+      _errorMessage = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
 }

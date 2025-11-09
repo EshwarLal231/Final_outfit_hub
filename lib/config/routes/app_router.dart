@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import '../../screens/splash/splash_screen.dart';
 import '../../screens/auth/login_screen.dart';
 import '../../screens/auth/signup_screen.dart';
+import '../../screens/auth/email_verification_screen.dart';
 import '../../screens/auth/mfa_setup_screen.dart';
 import '../../screens/auth/mfa_verify_screen.dart';
 import '../../screens/admin/admin_dashboard_screen.dart';
@@ -31,6 +32,23 @@ class AppRouter {
         path: '/signup',
         name: 'signup',
         builder: (context, state) => const SignupScreen(),
+      ),
+      
+      // Email Verification Route
+      GoRoute(
+        path: '/email-verification',
+        name: 'email-verification',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+          return EmailVerificationScreen(
+            email: extra['email'] as String,
+            password: extra['password'] as String,
+            name: extra['name'] as String,
+            phone: extra['phone'] as String,
+            location: extra['location'] as String,
+            role: extra['role'] as String,
+          );
+        },
       ),
 
       // MFA (Two-Factor Authentication) Routes
