@@ -21,11 +21,45 @@ class _SignupScreenState extends State<SignupScreen> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _locationController = TextEditingController();
   
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
   String _selectedRole = 'buyer'; // buyer, seller, both
+  String? _selectedCity;
+  
+  // Major cities of Pakistan
+  final List<String> _pakistaniCities = [
+    'Karachi',
+    'Lahore',
+    'Islamabad',
+    'Rawalpindi',
+    'Faisalabad',
+    'Multan',
+    'Peshawar',
+    'Quetta',
+    'Sialkot',
+    'Gujranwala',
+    'Hyderabad',
+    'Sukkur',
+    'Larkana',
+    'Bahawalpur',
+    'Sargodha',
+    'Abbottabad',
+    'Mardan',
+    'Mingora',
+    'Rahim Yar Khan',
+    'Sahiwal',
+    'Okara',
+    'Mirpur Khas',
+    'Nawabshah',
+    'Dera Ghazi Khan',
+    'Jhang',
+    'Sheikhupura',
+    'Gujrat',
+    'Kasur',
+    'Muzaffarabad',
+    'Gilgit',
+  ];
 
   @override
   void dispose() {
@@ -34,12 +68,21 @@ class _SignupScreenState extends State<SignupScreen> {
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     _phoneController.dispose();
-    _locationController.dispose();
     super.dispose();
   }
 
   Future<void> _handleSignup() async {
     if (_formKey.currentState!.validate()) {
+      // Validate city selection
+      if (_selectedCity == null) {
+        Fluttertoast.showToast(
+          msg: "Please select your city!",
+          backgroundColor: AppTheme.errorColor,
+        );
+        return;
+      }
+      
+      // Validate password match
       if (_passwordController.text != _confirmPasswordController.text) {
         Fluttertoast.showToast(
           msg: "Passwords do not match!",
@@ -56,7 +99,7 @@ class _SignupScreenState extends State<SignupScreen> {
         email: _emailController.text.trim(),
         password: _passwordController.text,
         phone: _phoneController.text.trim(),
-        location: _locationController.text.trim(),
+        location: _selectedCity!,
         role: _selectedRole,
       );
 
@@ -74,7 +117,7 @@ class _SignupScreenState extends State<SignupScreen> {
             'password': _passwordController.text,
             'name': _nameController.text.trim(),
             'phone': _phoneController.text.trim(),
-            'location': _locationController.text.trim(),
+            'location': _selectedCity!,
             'role': _selectedRole,
           },
         );
@@ -132,6 +175,12 @@ class _SignupScreenState extends State<SignupScreen> {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your name';
                     }
+                    if (value.length < 3) {
+                      return 'Name must be at least 3 characters';
+                    }
+                    if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value)) {
+                      return 'Name should only contain letters';
+                    }
                     return null;
                   },
                 ),
@@ -148,8 +197,9 @@ class _SignupScreenState extends State<SignupScreen> {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your email';
                     }
-                    if (!value.contains('@')) {
-                      return 'Please enter a valid email';
+                    // Email regex validation
+                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                      return 'Please enter a valid email address';
                     }
                     return null;
                   },
@@ -160,30 +210,81 @@ class _SignupScreenState extends State<SignupScreen> {
                 CustomTextField(
                   controller: _phoneController,
                   label: 'Phone Number',
-                  hint: '+92-300-1234567',
+                  hint: '03001234567',
                   prefixIcon: Icons.phone_outlined,
                   keyboardType: TextInputType.phone,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your phone number';
                     }
+                    // Remove any spaces or dashes
+                    String cleanNumber = value.replaceAll(RegExp(r'[\s\-]'), '');
+                    // Pakistani phone number validation (11 digits starting with 0)
+                    if (!RegExp(r'^03[0-9]{9}$').hasMatch(cleanNumber)) {
+                      return 'Please enter a valid Pakistani number (03XXXXXXXXX)';
+                    }
                     return null;
                   },
                 ),
                 const SizedBox(height: 16),
 
-                // Location Field
-                CustomTextField(
-                  controller: _locationController,
-                  label: 'City',
-                  hint: 'Enter your city',
-                  prefixIcon: Icons.location_on_outlined,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your city';
-                    }
-                    return null;
-                  },
+                // City Dropdown
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'City',
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppTheme.surfaceColor,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: _selectedCity == null 
+                              ? AppTheme.borderColor 
+                              : AppTheme.primaryColor,
+                        ),
+                      ),
+                      child: DropdownButtonFormField<String>(
+                        value: _selectedCity,
+                        decoration: InputDecoration(
+                          hintText: 'Select your city',
+                          prefixIcon: Icon(
+                            Icons.location_city_outlined,
+                            color: AppTheme.primaryColor,
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                        ),
+                        icon: const Icon(Icons.arrow_drop_down),
+                        isExpanded: true,
+                        items: _pakistaniCities.map((String city) {
+                          return DropdownMenuItem<String>(
+                            value: city,
+                            child: Text(city),
+                          );
+                        }).toList(),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            _selectedCity = newValue;
+                          });
+                        },
+                        validator: (value) {
+                          if (value == null) {
+                            return 'Please select your city';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
 
@@ -260,7 +361,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 CustomTextField(
                   controller: _passwordController,
                   label: 'Password',
-                  hint: 'Create a password',
+                  hint: 'Create a strong password',
                   prefixIcon: Icons.lock_outline,
                   obscureText: !_isPasswordVisible,
                   suffixIcon: IconButton(
@@ -281,6 +382,15 @@ class _SignupScreenState extends State<SignupScreen> {
                     }
                     if (value.length < 8) {
                       return 'Password must be at least 8 characters';
+                    }
+                    if (!RegExp(r'[A-Z]').hasMatch(value)) {
+                      return 'Password must contain at least one uppercase letter';
+                    }
+                    if (!RegExp(r'[a-z]').hasMatch(value)) {
+                      return 'Password must contain at least one lowercase letter';
+                    }
+                    if (!RegExp(r'[0-9]').hasMatch(value)) {
+                      return 'Password must contain at least one number';
                     }
                     return null;
                   },
@@ -309,6 +419,9 @@ class _SignupScreenState extends State<SignupScreen> {
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please confirm your password';
+                    }
+                    if (value != _passwordController.text) {
+                      return 'Passwords do not match';
                     }
                     return null;
                   },
