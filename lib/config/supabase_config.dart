@@ -2,8 +2,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseConfig {
   // Supabase credentials
-  static const String supabaseUrl = 'https://bnhhpcdzylazzjvhdogi.supabase.co';
-  static const String supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuaGhwY2R6eWxhenpqdmhkb2dpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI1NTUwMDUsImV4cCI6MjA3ODEzMTAwNX0.uy4mC6mFk8Ze2P10p6BUsqM3RLN0z9nqrOKSfp7gzTY';
+  static const String supabaseUrl = 'https://kovojvgzlzcegidlhmek.supabase.co';
+  static const String supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtvdm9qdmd6bHpjZWdpZGxobWVrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI2OTUyODUsImV4cCI6MjA3ODI3MTI4NX0.N9XLX97XzXETvtsZE4Kws9iQUyTSFkWwiEfDo_HZngE';
 
   // Initialize Supabase
   static Future<void> initialize() async {

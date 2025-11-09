@@ -202,46 +202,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                 ),
                 
-                const SizedBox(height: 24),
-                
-                // Demo Credentials Info
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: AppTheme.primaryColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: AppTheme.primaryColor.withOpacity(0.3),
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.info_outline,
-                            size: 20,
-                            color: AppTheme.primaryColor,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Demo Credentials',
-                            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                              color: AppTheme.primaryColor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      _buildDemoCredential('Admin', 'admin@outfithub.com', 'admin123'),
-                      const SizedBox(height: 8),
-                      _buildDemoCredential('User', 'user@outfithub.com', 'user123'),
-                    ],
-                  ),
-                ),
-                
                 const SizedBox(height: 32),
                 
                 // Sign Up Link
@@ -268,30 +228,6 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildDemoCredential(String role, String email, String password) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '$role Account:',
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            fontWeight: FontWeight.w600,
-            color: AppTheme.textPrimaryColor,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          'Email: $email',
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-        Text(
-          'Password: $password',
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-      ],
     );
   }
 }

@@ -28,20 +28,38 @@ class AuthService {
         throw Exception('Failed to create account');
       }
 
-      // Update user profile in users table
-      final userProfile = await _supabase
-          .from(SupabaseConfig.usersTable)
-          .update({
-            'name': name,
-            'phone': phone,
-            'location': location,
-            'role': role,
-          })
-          .eq('id', authResponse.user!.id)
-          .select()
-          .single();
+      // Try to insert/upsert user profile in users table
+      try {
+        final userProfile = await _supabase
+            .from(SupabaseConfig.usersTable)
+            .upsert({
+              'id': authResponse.user!.id,
+              'name': name,
+              'email': email,
+              'phone': phone,
+              'location': location,
+              'role': role,
+            })
+            .select()
+            .single();
 
-      return UserModel.fromJson(userProfile);
+        return UserModel.fromJson(userProfile);
+      } catch (tableError) {
+        // If table doesn't exist yet, return a basic user model
+        print('Warning: Users table not found. User created in auth but not in database.');
+        print('Please run the SQL schema in Supabase dashboard.');
+        return UserModel(
+          id: authResponse.user!.id,
+          name: name,
+          email: email,
+          phone: phone,
+          location: location,
+          role: role,
+          isActive: true,
+          isVerified: false,
+          createdAt: DateTime.now(),
+        );
+      }
     } on AuthException catch (e) {
       throw Exception(e.message);
     } catch (e) {

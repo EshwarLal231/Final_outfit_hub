@@ -42,6 +42,9 @@ dependencies:
   # Image Picker
   image_picker: ^1.0.7
   
+  # QR Code Generator
+  qr_flutter: ^4.1.0
+  
   # Toast Messages
   fluttertoast: ^8.2.4
   

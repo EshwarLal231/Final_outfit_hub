@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS public.categories (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Insert default categories
+
 INSERT INTO public.categories (name, slug, description) VALUES
   ('Women', 'women', 'Women''s clothing and accessories'),
   ('Men', 'men', 'Men''s clothing and accessories'),
@@ -154,52 +154,67 @@ ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
 
 -- USERS TABLE POLICIES
+DROP POLICY IF EXISTS "Users can view all profiles" ON public.users;
 CREATE POLICY "Users can view all profiles" ON public.users
   FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "Users can update own profile" ON public.users;
 CREATE POLICY "Users can update own profile" ON public.users
   FOR UPDATE USING (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Users can insert own profile" ON public.users;
 CREATE POLICY "Users can insert own profile" ON public.users
   FOR INSERT WITH CHECK (auth.uid() = id);
 
 -- PRODUCTS TABLE POLICIES
+DROP POLICY IF EXISTS "Anyone can view available products" ON public.products;
 CREATE POLICY "Anyone can view available products" ON public.products
   FOR SELECT USING (is_available = true OR seller_id = auth.uid());
 
+DROP POLICY IF EXISTS "Sellers can insert own products" ON public.products;
 CREATE POLICY "Sellers can insert own products" ON public.products
   FOR INSERT WITH CHECK (auth.uid() = seller_id);
 
+DROP POLICY IF EXISTS "Sellers can update own products" ON public.products;
 CREATE POLICY "Sellers can update own products" ON public.products
   FOR UPDATE USING (auth.uid() = seller_id);
 
+DROP POLICY IF EXISTS "Sellers can delete own products" ON public.products;
 CREATE POLICY "Sellers can delete own products" ON public.products
   FOR DELETE USING (auth.uid() = seller_id);
 
 -- FAVORITES TABLE POLICIES
+DROP POLICY IF EXISTS "Users can view own favorites" ON public.favorites;
 CREATE POLICY "Users can view own favorites" ON public.favorites
   FOR SELECT USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert own favorites" ON public.favorites;
 CREATE POLICY "Users can insert own favorites" ON public.favorites
   FOR INSERT WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can delete own favorites" ON public.favorites;
 CREATE POLICY "Users can delete own favorites" ON public.favorites
   FOR DELETE USING (auth.uid() = user_id);
 
 -- ORDERS TABLE POLICIES
+DROP POLICY IF EXISTS "Users can view own orders" ON public.orders;
 CREATE POLICY "Users can view own orders" ON public.orders
   FOR SELECT USING (auth.uid() = buyer_id OR auth.uid() = seller_id);
 
+DROP POLICY IF EXISTS "Buyers can create orders" ON public.orders;
 CREATE POLICY "Buyers can create orders" ON public.orders
   FOR INSERT WITH CHECK (auth.uid() = buyer_id);
 
+DROP POLICY IF EXISTS "Sellers can update order status" ON public.orders;
 CREATE POLICY "Sellers can update order status" ON public.orders
   FOR UPDATE USING (auth.uid() = seller_id);
 
 -- REVIEWS TABLE POLICIES
+DROP POLICY IF EXISTS "Anyone can view reviews" ON public.reviews;
 CREATE POLICY "Anyone can view reviews" ON public.reviews
   FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "Users can insert own reviews" ON public.reviews;
 CREATE POLICY "Users can insert own reviews" ON public.reviews
   FOR INSERT WITH CHECK (auth.uid() = reviewer_id);
 
@@ -217,12 +232,15 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Triggers for updated_at
+DROP TRIGGER IF EXISTS update_users_updated_at ON public.users;
 CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON public.users
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_products_updated_at ON public.products;
 CREATE TRIGGER update_products_updated_at BEFORE UPDATE ON public.products
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_orders_updated_at ON public.orders;
 CREATE TRIGGER update_orders_updated_at BEFORE UPDATE ON public.orders
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
@@ -242,6 +260,7 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Trigger to create user profile automatically
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
@@ -289,4 +308,18 @@ $$ LANGUAGE plpgsql;
 -- Next steps:
 -- 1. Create storage buckets: product-images, profile-images
 -- 2. Set up storage policies for public access
--- 3. Test the integration with your Flutter app
+-- 3. Enable Multi-Factor Authentication (MFA/2FA)
+-- 4. Test the integration with your Flutter app
+
+-- ============================================
+-- 11. ENABLE MFA (TWO-FACTOR AUTHENTICATION)
+-- ============================================
+-- To enable MFA for your project:
+-- 1. Go to: Authentication > Providers > Phone or TOTP
+-- 2. Enable "Phone Authentication" or "Authenticator app (TOTP)"
+-- 3. For TOTP: No additional configuration needed
+-- 4. For Phone: Configure your SMS provider
+
+-- MFA is now ready to use in the Flutter app!
+-- Users can enroll using the MFA setup screen
+

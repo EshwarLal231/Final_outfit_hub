@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../screens/splash/splash_screen.dart';
 import '../../screens/auth/login_screen.dart';
 import '../../screens/auth/signup_screen.dart';
+import '../../screens/auth/mfa_setup_screen.dart';
+import '../../screens/auth/mfa_verify_screen.dart';
 import '../../screens/admin/admin_dashboard_screen.dart';
 import '../../screens/home/home_screen.dart';
 import '../../screens/buyer/browse_screen.dart';
@@ -30,6 +31,25 @@ class AppRouter {
         path: '/signup',
         name: 'signup',
         builder: (context, state) => const SignupScreen(),
+      ),
+
+      // MFA (Two-Factor Authentication) Routes
+      GoRoute(
+        path: '/mfa-setup',
+        name: 'mfa-setup',
+        builder: (context, state) => const MFASetupScreen(),
+      ),
+      GoRoute(
+        path: '/mfa-verify',
+        name: 'mfa-verify',
+        builder: (context, state) {
+          final factorId = state.uri.queryParameters['factorId'] ?? '';
+          final challengeId = state.uri.queryParameters['challengeId'] ?? '';
+          return MFAVerifyScreen(
+            factorId: factorId,
+            challengeId: challengeId,
+          );
+        },
       ),
 
       // User Home
