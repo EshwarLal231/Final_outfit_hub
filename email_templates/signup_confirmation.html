@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirm Your Signup - Outfit Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 30px;
+            text-align: center;
+            color: #ffffff;
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px 30px;
+        }
+        
+        .greeting {
+            font-size: 24px;
+            color: #1a1a1a;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .message {
+            font-size: 16px;
+            color: #666666;
+            margin-bottom: 30px;
+            line-height: 1.8;
+        }
+        
+        .message strong {
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .confirmation-box {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf3 100%);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .confirmation-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+        
+        .confirmation-text {
+            font-size: 18px;
+            color: #1a1a1a;
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+        
+        .button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            text-decoration: none;
+            padding: 16px 50px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: transform 0.2s;
+            box-shadow: 0 4px 6px rgba(102, 126, 234, 0.3);
+        }
+        
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(102, 126, 234, 0.4);
+        }
+        
+        .or-divider {
+            margin: 30px 0;
+            text-align: center;
+            position: relative;
+        }
+        
+        .or-divider::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 50%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, #e0e0e0, transparent);
+        }
+        
+        .or-divider span {
+            background: white;
+            padding: 0 15px;
+            position: relative;
+            color: #999999;
+            font-size: 14px;
+        }
+        
+        .link-box {
+            background-color: #f8f9fa;
+            border: 2px dashed #d0d0d0;
+            border-radius: 8px;
+            padding: 15px;
+            word-break: break-all;
+            font-size: 13px;
+            color: #667eea;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .features {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+        
+        .features h3 {
+            font-size: 18px;
+            color: #1a1a1a;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .feature-list {
+            display: grid;
+            gap: 12px;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            font-size: 14px;
+            color: #424242;
+        }
+        
+        .feature-item::before {
+            content: "✓";
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            margin-right: 12px;
+            flex-shrink: 0;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .security-notice {
+            background-color: #fff8e1;
+            border-left: 4px solid #ffc107;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 14px;
+            color: #856404;
+        }
+        
+        .security-notice strong {
+            color: #ff9800;
+        }
+        
+        .help-box {
+            background-color: #e3f2fd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        
+        .help-box h3 {
+            font-size: 16px;
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+        
+        .help-box p {
+            font-size: 14px;
+            color: #424242;
+            margin-bottom: 15px;
+        }
+        
+        .help-link {
+            color: #1976d2;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .help-link:hover {
+            text-decoration: underline;
+        }
+        
+        .divider {
+            height: 1px;
+            background: linear-gradient(to right, transparent, #e0e0e0, transparent);
+            margin: 30px 0;
+        }
+        
+        .footer {
+            background-color: #f5f5f5;
+            padding: 30px;
+            text-align: center;
+            color: #666666;
+            font-size: 14px;
+        }
+        
+        .footer-links {
+            margin: 20px 0;
+        }
+        
+        .footer-links a {
+            color: #667eea;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: 500;
+        }
+        
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+        
+        .social-links {
+            margin: 20px 0;
+        }
+        
+        .social-links a {
+            display: inline-block;
+            margin: 0 8px;
+            color: #999999;
+            text-decoration: none;
+            font-size: 18px;
+        }
+        
+        .copyright {
+            margin-top: 20px;
+            color: #999999;
+            font-size: 12px;
+        }
+        
+        @media only screen and (max-width: 600px) {
+            body {
+                padding: 0;
+            }
+            
+            .email-container {
+                border-radius: 0;
+            }
+            
+            .header {
+                padding: 30px 20px;
+            }
+            
+            .header h1 {
+                font-size: 26px;
+            }
+            
+            .content {
+                padding: 30px 20px;
+            }
+            
+            .greeting {
+                font-size: 20px;
+            }
+            
+            .button {
+                padding: 14px 40px;
+                font-size: 15px;
+            }
+            
+            .footer {
+                padding: 20px;
+            }
+            
+            .footer-links a {
+                display: block;
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">👔</div>
+            <h1>Outfit Hub</h1>
+            <p>Your Fashion Marketplace Awaits!</p>
+        </div>
+        
+        <!-- Content -->
+        <div class="content">
+            <div class="greeting">
+                Welcome! 🎉
+            </div>
+            
+            <div class="message">
+                Thank you for joining <strong>Outfit Hub</strong>, Pakistan's premier marketplace for pre-owned fashion! We're thrilled to have you as part of our growing community of fashion enthusiasts.
+            </div>
+            
+            <!-- Confirmation Box -->
+            <div class="confirmation-box">
+                <div class="confirmation-icon">📧</div>
+                <div class="confirmation-text">
+                    One more step to get started!
+                </div>
+                <a href="{{ .ConfirmationURL }}" class="button">
+                    Confirm Your Email
+                </a>
+            </div>
+            
+            <!-- Security Notice -->
+            <div class="security-notice">
+                ⏰ <strong>Important:</strong> This confirmation link expires in <strong>24 hours</strong>. Please confirm your email soon to activate your account.
+            </div>
+            
+            <!-- Or Divider -->
+            <div class="or-divider">
+                <span>Or copy this link</span>
+            </div>
+            
+            <!-- Link Box -->
+            <div class="link-box">
+                {{ .ConfirmationURL }}
+            </div>
+            
+            <!-- Features Section -->
+            <div class="features">
+                <h3>🌟 What You Can Do with Outfit Hub</h3>
+                <div class="feature-list">
+                    <div class="feature-item">
+                        Browse thousands of pre-owned fashion items at great prices
+                    </div>
+                    <div class="feature-item">
+                        Sell your gently used clothing and make extra income
+                    </div>
+                    <div class="feature-item">
+                        Connect with fashion lovers across Pakistan
+                    </div>
+                    <div class="feature-item">
+                        Shop sustainably and reduce fashion waste
+                    </div>
+                    <div class="feature-item">
+                        Secure payments and verified sellers for peace of mind
+                    </div>
+                </div>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <!-- Help Box -->
+            <div class="help-box">
+                <h3>Need Help?</h3>
+                <p>If you didn't create this account or have any questions, our support team is here for you!</p>
+                <a href="#" class="help-link">Contact Support →</a>
+            </div>
+            
+            <div class="message" style="text-align: center; margin-top: 30px;">
+                We can't wait to see you explore the world of sustainable fashion! 💚
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-links">
+                <a href="#">Help Center</a>
+                <a href="#">Contact Support</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+            </div>
+            
+            <div class="social-links">
+                <a href="#" title="Facebook">📘</a>
+                <a href="#" title="Instagram">📷</a>
+                <a href="#" title="Twitter">🐦</a>
+                <a href="#" title="LinkedIn">💼</a>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <p style="margin: 15px 0;">
+                <strong>Outfit Hub</strong><br>
+                Your trusted marketplace for pre-owned fashion<br>
+                Karachi, Pakistan
+            </p>
+            
+            <div class="copyright">
+                © 2025 Outfit Hub. All rights reserved.<br>
+                This email was sent to you as part of your account registration process.
+            </div>
+        </div>
+    </div>
+</body>
+</html>

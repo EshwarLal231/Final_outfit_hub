@@ -273,14 +273,16 @@ Before deploying:
 1. **Enable Email Confirmation** (if not done)
    - Authentication → Providers → Email → "Confirm email" ON
 
-2. **Add Custom Template** (follow steps above)
+2. **Add Custom Templates** (follow steps above)
+   - **OTP Verification**: Use `otp_verification.html` for 6-digit code emails
+   - **Signup Confirmation**: Use `signup_confirmation.html` for link-based confirmation
    - Authentication → Email Templates → Confirm signup
 
 3. **Test Signup Flow**
    - Run app: `flutter run`
    - Sign up with real email
    - Check beautiful email!
-   - Enter OTP code
+   - Enter OTP code or click confirmation link
 
 4. **Customize Other Templates** (optional)
    - Reset password email

@@ -15,12 +15,26 @@ class AuthService {
     String role = 'buyer',
   }) async {
     try {
+      // ✅ CHECK: Prevent duplicate email registration
+      final existingUsers = await _supabase
+          .from(SupabaseConfig.usersTable)
+          .select('email')
+          .eq('email', email.toLowerCase())
+          .maybeSingle();
+      
+      if (existingUsers != null) {
+        throw Exception('This email is already registered. Please login instead.');
+      }
+
       // Sign up with Supabase Auth
       final authResponse = await _supabase.auth.signUp(
         email: email,
         password: password,
         data: {
           'name': name,
+          'phone': phone,  // ✅ ADDED: Save phone in metadata
+          'location': location,  // ✅ ADDED: Save location in metadata
+          'role': role,  // ✅ ADDED: Save role in metadata
         },
       );
 
@@ -212,12 +226,26 @@ class AuthService {
     String role = 'buyer',
   }) async {
     try {
+      // ✅ CHECK: Prevent duplicate email registration
+      final existingUsers = await _supabase
+          .from(SupabaseConfig.usersTable)
+          .select('email')
+          .eq('email', email.toLowerCase())
+          .maybeSingle();
+      
+      if (existingUsers != null) {
+        throw Exception('This email is already registered. Please login instead.');
+      }
+
       // Sign up with Supabase Auth - email confirmation will be required
       final authResponse = await _supabase.auth.signUp(
         email: email,
         password: password,
         data: {
           'name': name,
+          'phone': phone,  // ✅ ADDED: Save phone in metadata
+          'location': location,  // ✅ ADDED: Save location in metadata
+          'role': role,  // ✅ ADDED: Save role in metadata
         },
         emailRedirectTo: null, // This ensures OTP is sent
       );

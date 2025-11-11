@@ -4,21 +4,24 @@
 -- ============================================
 -- 1. USERS TABLE (extends Supabase auth.users)
 -- ============================================
-CREATE TABLE IF NOT EXISTS public.users (
+CREATE TABLE public.users (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  name TEXT NOT NULL,
-  email TEXT UNIQUE NOT NULL,
-  phone TEXT,
-  location TEXT,
-  role TEXT NOT NULL DEFAULT 'buyer' CHECK (role IN ('buyer', 'seller', 'both', 'admin')),
+  email VARCHAR(255) NOT NULL UNIQUE,  -- ✅ UNIQUE constraint prevents duplicate emails
+  name VARCHAR(100) NOT NULL,
+  phone VARCHAR(20),
+  location VARCHAR(100),
+  role VARCHAR(20) DEFAULT 'buyer' CHECK (role IN ('buyer', 'seller', 'admin', 'both')),
   profile_picture TEXT,
-  rating DECIMAL(3,2) DEFAULT 0.0,
-  total_transactions INTEGER DEFAULT 0,
-  is_active BOOLEAN DEFAULT true,
+  rating DECIMAL(3,2) DEFAULT 0.00,
+  total_sales INTEGER DEFAULT 0,
   is_verified BOOLEAN DEFAULT false,
+  is_active BOOLEAN DEFAULT true,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- ✅ Additional index for case-insensitive email uniqueness
+CREATE UNIQUE INDEX users_email_lower_unique ON public.users (LOWER(email));
 
 -- ============================================
 -- 2. CATEGORIES TABLE
@@ -219,48 +222,27 @@ CREATE POLICY "Users can insert own reviews" ON public.reviews
   FOR INSERT WITH CHECK (auth.uid() = reviewer_id);
 
 -- ============================================
--- 9. FUNCTIONS & TRIGGERS
+-- 9. DATABASE TRIGGERS
 -- ============================================
-
--- Function to update updated_at timestamp
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
-BEGIN
-  NEW.updated_at = NOW();
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
--- Triggers for updated_at
-DROP TRIGGER IF EXISTS update_users_updated_at ON public.users;
-CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON public.users
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-DROP TRIGGER IF EXISTS update_products_updated_at ON public.products;
-CREATE TRIGGER update_products_updated_at BEFORE UPDATE ON public.products
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-DROP TRIGGER IF EXISTS update_orders_updated_at ON public.orders;
-CREATE TRIGGER update_orders_updated_at BEFORE UPDATE ON public.orders
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
--- Function to create user profile after signup
+-- Trigger to automatically create user profile when auth user is created
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.users (id, email, name, created_at)
+  INSERT INTO public.users (id, email, name, phone, location, role, created_at)
   VALUES (
     NEW.id,
     NEW.email,
-    COALESCE(NEW.raw_user_meta_data->>'name', 'User'),
-    NEW.created_at
+    NEW.raw_user_meta_data->>'name',
+    NEW.raw_user_meta_data->>'phone',
+    NEW.raw_user_meta_data->>'location',
+    COALESCE(NEW.raw_user_meta_data->>'role', 'buyer'),
+    NOW()
   );
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Trigger to create user profile automatically
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+-- Trigger when new user signs up
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
